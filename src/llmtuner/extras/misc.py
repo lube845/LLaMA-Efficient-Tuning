@@ -83,6 +83,7 @@ def count_parameters(model: torch.nn.Module) -> Tuple[int, int]:
 
 
 # Includes: (1) cast the layernorm in fp32 (2) make output embedding layer require grads (3) upcast the lm_head to fp32
+# 将层归一化参数转换为 torch.float32 数据类型，启用梯度检查点，以及根据微调类型调整模型的输出层。这些预处理步骤有助于提高训练过程的稳定性和效率。
 # Inspired by: https://github.com/huggingface/peft/blob/c0209c35abbf88c63aa267800d98a8e212ed0a42/src/peft/utils/other.py#L35
 def prepare_model_for_training(
     model: "PreTrainedModel",
@@ -93,6 +94,7 @@ def prepare_model_for_training(
 ) -> "PreTrainedModel":
 
     for name, param in model.named_parameters():
+        # 维度为1的参数是因为这些参数通常是一些小的参数，例如LayerNorm层的偏置项或缩放因子。这些小的参数可能会因为数值过小而导致数值不稳定，从而影响模型的性能。
         if param.ndim == 1 and any(layer_norm_name in name for layer_norm_name in layer_norm_names):
             param.data = param.data.to(torch.float32)
 

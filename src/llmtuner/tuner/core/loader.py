@@ -55,6 +55,7 @@ def load_model_and_tokenizer(
     assert stage in ["pt", "sft"] or finetuning_args.finetuning_type == "lora", \
         "RM and PPO training can only be performed with the LoRA method."
 
+    # from_pretrained最基础的参数，需要指定的
     config_kwargs = {
         "trust_remote_code": True,
         "cache_dir": model_args.cache_dir,
@@ -131,6 +132,7 @@ def load_model_and_tokenizer(
                     "summary.bias": getattr(model, "reward_head_bias")
                 })
 
+        # TODO 看看评价模型如何搞
         if stage == "ppo": # load reward model
             assert is_trainable, "PPO stage cannot be performed at evaluation."
             assert model_args.reward_model is not None, "Reward model is necessary for PPO training."

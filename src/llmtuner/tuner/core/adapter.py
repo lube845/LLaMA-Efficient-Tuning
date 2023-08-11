@@ -65,6 +65,7 @@ def init_adapter(
             assert os.path.exists(os.path.join(model_args.checkpoint_dir[0], CONFIG_NAME)), \
                 "The given checkpoint may be not a LoRA checkpoint, please specify `--finetuning_type full/freeze` instead."
 
+            # 量化了则is_mergeable为False，没量化则为True
             if (is_trainable and model_args.resume_lora_training) or (not is_mergeable): # continually train on the lora weights
                 checkpoints_to_merge, latest_checkpoint = model_args.checkpoint_dir[:-1], model_args.checkpoint_dir[-1]
             else:

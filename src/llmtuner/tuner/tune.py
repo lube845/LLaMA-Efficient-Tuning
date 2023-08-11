@@ -12,9 +12,10 @@ if TYPE_CHECKING:
 
 
 def run_exp(args: Optional[Dict[str, Any]] = None, callbacks: Optional[List["TrainerCallback"]] = None):
+
+    # train_args是transformers的Seq2SeqTrainingArguments
     model_args, data_args, training_args, finetuning_args, general_args = get_train_args(args)
     callbacks = [LogCallback()] if callbacks is None else callbacks
-
     if general_args.stage == "pt":
         run_pt(model_args, data_args, training_args, finetuning_args, callbacks)
     elif general_args.stage == "sft":

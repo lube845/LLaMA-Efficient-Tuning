@@ -115,6 +115,7 @@ class DataArguments:
             if name not in dataset_info:
                 raise ValueError("Undefined dataset {} in dataset_info.json.".format(name))
 
+            # 三种数据dataset，hf_url的，script_url的，以及自己的
             if "hf_hub_url" in dataset_info[name]:
                 dataset_attr = DatasetAttr("hf_hub", dataset_name=dataset_info[name]["hf_hub_url"])
             elif "script_url" in dataset_info[name]:

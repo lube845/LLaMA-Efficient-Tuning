@@ -44,6 +44,7 @@ def get_dataset(
     max_samples = data_args.max_samples
     all_datasets: List["Dataset"] = [] # support multiple datasets
 
+    # 三种数据dataset，hf_url的，script_url的，以及自己的
     for dataset_attr in data_args.dataset_list:
         logger.info("Loading dataset {}...".format(dataset_attr))
 
@@ -78,10 +79,10 @@ def get_dataset(
         dataset = load_dataset(
             data_path,
             data_files=data_files,
-            split=data_args.split,
+            split=data_args.split,  # 是train还是test
             cache_dir=model_args.cache_dir,
-            streaming=data_args.streaming,
-            use_auth_token=True if model_args.use_auth_token else None
+            streaming=data_args.streaming,  # enable streaming mode
+            use_auth_token=True if model_args.use_auth_token else None  # 是否需要hf账号
         )
 
         if max_samples is not None:
@@ -92,7 +93,7 @@ def get_dataset(
             if getattr(dataset_attr, column_name) and getattr(dataset_attr, column_name) != column_name:
                 dataset = dataset.rename_column(getattr(dataset_attr, column_name), column_name)
 
-        if dataset_attr.source_prefix: # add prefix
+        if dataset_attr.source_prefix:  # add prefix
             features = None
             if data_args.streaming:
                 features = dataset.features
