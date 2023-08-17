@@ -14,8 +14,9 @@ class ChatModel:
     def __init__(self, args: Optional[Dict[str, Any]] = None) -> None:
         model_args, data_args, finetuning_args, self.generating_args = get_infer_args(args)
         self.model, self.tokenizer = load_model_and_tokenizer(model_args, finetuning_args)
+        # 通过accelerate往多gpu里分发
         self.model = dispatch_model(self.model)
-        self.model = self.model.eval() # change to eval mode
+        self.model = self.model.eval()  # change to eval mode
         self.template = get_template_and_fix_tokenizer(data_args.template, self.tokenizer)
         self.source_prefix = data_args.source_prefix
         self.stop_ids = self.tokenizer.convert_tokens_to_ids(self.template.stop_words)
@@ -30,6 +31,7 @@ class ChatModel:
     ) -> Tuple[Dict[str, Any], int]:
         prefix = prefix or self.source_prefix
 
+        # prompt就是history+当前query的encoder id，_就是”“的id
         prompt, _ = self.template.encode_oneturn(
             tokenizer=self.tokenizer, query=query, resp="", history=history, prefix=prefix
         )

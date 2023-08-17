@@ -30,11 +30,13 @@ class Template:
         r"""
         Returns a single pair of token ids representing prompt and response respectively.
         """
+        # 得到prefix列表和history列表，history列表包括query，resp
         prefix, history = self._format(query, resp, history, prefix)
         encoded_pairs = self._encode(tokenizer, prefix, history)
         prompt_ids = []
         for query_ids, resp_ids in encoded_pairs[:-1]:
             prompt_ids = prompt_ids + query_ids + resp_ids
+        # 这时prompt_id包括历史信息+query的encoding，第二个返回项就是当前的resp
         prompt_ids = prompt_ids + encoded_pairs[-1][0]
         return prompt_ids, encoded_pairs[-1][1]
 
@@ -62,6 +64,7 @@ class Template:
     ) -> Tuple[List[Union[str, Dict[str, str]]], List[Tuple[str, str]]]:
         r"""
         Aligns inputs to a special format.
+        把当前query和resp都放进history列表，再返回prefix
         """
         prefix = [prefix] if prefix else self.prefix # use prefix if provided
         history = history if (history and self.use_history) else []
@@ -92,10 +95,12 @@ class Template:
     ) -> List[Tuple[List[int], List[int]]]:
         r"""
         Encodes formatted inputs to pairs of token ids.
+        只用输入prompt即可，不用加上各种特殊符号
         """
         bos_ids, eos_ids = self._get_special_ids(tokenizer)
         sep_ids = self._convert_inputs_to_ids(tokenizer, context=self.sep)
         encoded_pairs = []
+        # 第一个提问加上prefix，之后都不用了
         for turn_idx, (query, resp) in enumerate(history):
             if turn_idx != 0:
                 prefix_ids = sep_ids

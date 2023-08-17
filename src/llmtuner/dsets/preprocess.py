@@ -138,6 +138,7 @@ def preprocess_dataset(
         preprocess_function = preprocess_pretrain_dataset
         print_function = print_unsupervised_dataset_example
     elif stage == "sft" and not training_args.predict_with_generate:
+        # 筛选掉prompt和response中有一个为空的数据
         dataset = dataset.filter(lambda example: example["prompt"] and example["response"])
         preprocess_function = preprocess_supervised_dataset
         print_function = print_supervised_dataset_example
